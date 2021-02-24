@@ -5,8 +5,13 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 require("dotenv/config");
 const api = process.env.API_URL;
-const productsRouter = require("./routers/products");
 const cors = require("cors");
+
+//ROUTES
+const categoriesRoutes = require("./routes/categories");
+const usersRoutes = require("./routes/users");
+const productsRoutes = require("./routes/products");
+const ordersRoutes = require("./routes/orders");
 
 //CORS
 app.use(cors());
@@ -14,9 +19,13 @@ app.options("*", cors());
 
 //MIDDLEWARE
 app.use(bodyParser.json());
-app.use(`${api}/products`, productsRouter)
 app.use(morgan("tiny"));
+app.use(`${api}/categories`, categoriesRoutes);
+app.use(`${api}/users`, usersRoutes);
+app.use(`${api}/products`, productsRoutes);
+app.use(`${api}/orders`, ordersRoutes);
 
+//DATABASE
 mongoose.connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -29,7 +38,7 @@ mongoose.connect(process.env.CONNECTION_STRING, {
     console.log("error connecting to db: ", err);
 })
 
-
+//SERVER
 app.listen(3000, () => {
     console.log(api);
     console.log("Server is running on localhost http://localhost:3000");
