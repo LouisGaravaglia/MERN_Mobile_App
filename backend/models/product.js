@@ -58,6 +58,16 @@ const productSchema = mongoose.Schema({
     }
 });
 
+//this is a way to add a new property but copying it from an existing field, this case
+//we are copying the _id property to a property just called id
+productSchema.virtual("id").get(function () {
+    return this._id.toHexString();
+});
+
+productSchema.set("toJSON", {
+    virtuals: true
+});
+
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;

@@ -5,11 +5,18 @@ const Category = require("../models/category")
 const mongoose = require("mongoose");
 
 router.get(`/`, async (req, res) => {
+
     try {
         //use .select() to tell database which properties to return
         //if you use - and then property name, it will remove that field
         // const productList = await Product.find().select("name image")
-        const productList = await Product.find()
+
+        //localhost:3000/api/v1/products?categories=2348faakjl4022jakljs45
+        let filter = {};
+        if (req.query.categories) filter = {category: req.query.categories.split(",")};
+        const productList = await Product.find(filter).populate("category");
+        console.log("filter is: ", filter);
+
         res.send(productList);
     } catch (e) {
         res.status(500).json({success: false})
@@ -140,6 +147,20 @@ router.get("/get/count", async (req, res) => {
     } else {
         return res.send({
             productCount
+        });
+    }
+});
+
+router.get("/get/featured/:count", async (req, res) => {
+    const count = req.params.count ? req.params.count : 0;
+    //how to filter only products that are featured
+    const products = await Product.find({isFeatured: true}).limit(+count);
+
+    if (!products) {
+        return res.status(500).json({success: false})
+    } else {
+        return res.send({
+            products
         });
     }
 });
