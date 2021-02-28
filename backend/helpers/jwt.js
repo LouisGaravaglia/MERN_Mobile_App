@@ -1,12 +1,20 @@
 const expressJwt = require("express-jwt");
 // const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
+// const api = process.env.API_URL
 
 function authJwt() {
     console.log("im in authRequired***********");
     return expressJwt({
         secret,
         algorithms: ['HS256']
+    }).unless({
+        path: [
+            {url: /\/api\/v1\/products(.*)/, methods: ["GET", "OPTIONS"]},
+            {url: /\/api\/v1\/categories(.*)/, methods: ["GET", "OPTIONS"]},
+            "/api/v1/users/login",
+            "/api/v1/users/register"
+        ]
     });
 };
 
