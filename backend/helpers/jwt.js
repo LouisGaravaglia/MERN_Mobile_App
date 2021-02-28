@@ -7,7 +7,8 @@ function authJwt() {
     console.log("im in authRequired***********");
     return expressJwt({
         secret,
-        algorithms: ['HS256']
+        algorithms: ['HS256'],
+        isRevoked: isRevoked
     }).unless({
         path: [
             {url: /\/api\/v1\/products(.*)/, methods: ["GET", "OPTIONS"]},
@@ -18,6 +19,13 @@ function authJwt() {
     });
 };
 
+async function isRevoked(req, payload, done) {
+    if (!payload.isAdmin) {
+        done(null, true);
+    };
+
+    done();
+}
 
 // function authRequired(err, req, res, next) {
 //     try {
