@@ -72,9 +72,35 @@ router.post('/login', async (req,res) => {
         res.status(200).send({user: user.email , token: token}) 
     } else {
        res.status(400).send('password is wrong!');
-    }
+    };
+});
 
-    
-})
+router.get("/get/count", async (req, res) => {
+    //countDocuments is a way of showing how many proudcts the user has in his store
+    const userCount = await User.countDocuments((count) => count);
+
+    if (!userCount) {
+        return res.status(500).json({success: false})
+    } else {
+        return res.send({
+            userCount
+        });
+    }
+});
+
+router.delete("/:id", async (req, res) => {
+
+    try {
+        const user = await User.findByIdAndRemove(req.params.id)
+        if (user) {
+            return res.status(200).json({success:true, message: "the user is deleted"})
+        } else {
+            return res.status(404).json({success:true, message: "user not found"})
+        };
+    } catch (e) {
+        return res.status(400).json({success:false, message: e})
+    };
+
+});
 
 module.exports = router;
