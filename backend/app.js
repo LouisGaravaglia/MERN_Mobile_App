@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 require("dotenv/config");
 const api = process.env.API_URL;
 const cors = require("cors");
+const authJwt = require("./helpers/jwt");
 
 //ROUTES
 const categoriesRoutes = require("./routes/categories");
@@ -20,6 +21,7 @@ app.options("*", cors());
 //MIDDLEWARE
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
+app.use(authJwt());
 app.use(`${api}/categories`, categoriesRoutes);
 app.use(`${api}/users`, usersRoutes);
 app.use(`${api}/products`, productsRoutes);
