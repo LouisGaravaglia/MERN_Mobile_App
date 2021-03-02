@@ -75,7 +75,8 @@ router.post(`/`, uploadOptions.single("image"), async (req, res) => {
     try {
         const category = await Category.findById(req.body.category);
         if (!category) return res.status(400).send("Invalid Category");
-
+        const file = req.file;
+        if (!file) return res.status(400).send("No image in the request"); 
     } catch (e) {
         return res.status(500).send("there was an error finding the category")
     };
@@ -194,6 +195,44 @@ router.get("/get/featured/:count", async (req, res) => {
             products
         });
     }
+});
+
+router.put(`/gallery-images/:id`, uploadOptions.array("images", 10), async (req, res) => {
+    //conditional to check to make sure the ID is valid, if not, return right away
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(500).send("Invalid Product ID")
+
+    try {
+        const files = req.files;
+        const imagesPaths = [];
+        const basePath = `${req.protocol}://${req.get("host")}/pulic/upload/`;
+    
+        if (files) {
+            files.map(file => {
+                console.log("file", file);
+                imagesPaths.push(`${basePath}${file.filename}`);
+            });
+        };
+
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            {
+                images: imagesPaths
+            },
+            { new: true}
+        );
+
+        if (product) {
+            res.status(200).send(product);
+        } else {
+            res.status(500).json({success:false, message: "the product can not be found"})
+        }
+
+    } catch (e) {
+        return res.status(500).send("there was an error in adding the images")
+    };
+
+    
+
 });
 
 module.exports = router;
