@@ -5,7 +5,8 @@ const OrderItem = require('../models/order-item');
 
 router.get(`/`, async (req, res) => {
     try {
-        const orderList = await Order.find()
+        //sorting returned items from the db from date ordered newest to oldest
+        const orderList = await Order.find().populate("user", "name").sort({"dateOrdered": -1});
         res.send(orderList);
     } catch (e) {
         res.status(500).json({success: false})
@@ -15,9 +16,10 @@ router.get(`/`, async (req, res) => {
 router.get(`/:id`, async (req, res) =>{
     const order = await Order.findById(req.params.id)
     .populate('user', 'name')
+    //Showing the product details inside the orderItems, and then also showing the category info inside the product details
     .populate({ 
         path: 'orderItems', populate: {
-            path : 'product', populate: 'category'} 
+            path: 'product', populate: 'category'} 
         });
 
     if(!order) {
